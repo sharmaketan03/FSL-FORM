@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import "../index.css";
 import { instance } from '../axios.js';
+// import {useFormStatus} from "react-dom"
 
 function Home() {
   const [form, setForm] = useState({
@@ -8,7 +9,8 @@ function Home() {
     email: "",
     phone: "",
     date: "",
-    adhar: "",
+    imageFront: "",
+    imageBack:"",
     guardianDetails: "",
     guardianPhone: "",
     localaddress: "",
@@ -20,9 +22,12 @@ function Home() {
     Company: "",
     course: ""
   });
+  const [formdisabled,setDisabled]=useState(false)
 
   const [educational, setEducational] = useState("student");
 
+
+  
   function handelForm(e) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -30,24 +35,30 @@ function Home() {
 
   async function handelSumbit(e) {
     console.log("first");
+    setDisabled(false)
 
     e.preventDefault();
+    await new Promise(res=>setTimeout(res,2000))
     console.log(form);
 
     let res = await instance.post('/api/form/add', form);
     console.log(res);
+    if(res){
+        setDisabled(true)
+    }
   }
 
   function toggle(e) {
     setEducational(e.target.id);
   }
 
+
   return (
     <div className="w-[90%] mx-auto p-6 bg-white shadow-lg rounded-lg mt-30">
-      <form onSubmit={handelSumbit} className="space-y-6">
+      <form onSubmit={handelSumbit} className="space-y-6"  method="post" enctype="multipart/form-data">
 
-      
-        <div className="bg-gray-50 p-4 rounded-lg border">
+      {/* <Customerform/> */}
+                 <div className="bg-gray-50 p-4 rounded-lg border">
   <h2 className="text-2xl font-semibold mb-4">Personal Details</h2>
 
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -107,8 +118,8 @@ function Home() {
     </div>
   </div>
 
-  <div className="mt-6">
-    <p className="font-medium mb-2">Gender</p>
+  <div className="mt-6 flex">
+    <p className="font-medium mb-2 ">Gender</p>
     <div className="flex gap-6">
       <label className="flex items-center gap-1">
         <input type="radio" name="gender" value="male" onChange={handelForm} /> Male
@@ -121,9 +132,16 @@ function Home() {
       </label>
     </div>
   </div>
+  <div className='mt-6 font-medium mb-2 gap-6'>
+  <label htmlFor="aadhaarcard">Aadhaar Card:</label>
+  <input type="file"   name='imageFront' onChange={handelForm} value={form.imageFront}/>
+  <input type="file"   name='imageBack' onChange={handelForm} value={form.imageBack}/>
+
+</div>
 </div>
 
 
+       
        
         <div className="bg-gray-50 p-4 rounded-lg border">
           <h2 className="text-xl font-semibold mb-4">Parent / Guardian Details</h2>
@@ -224,7 +242,8 @@ function Home() {
           </div>
         </div>
 
-        <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6">Submit</button>
+        <button type="submit"   className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6">Submit</button>
+
       </form>
     </div>  
   );

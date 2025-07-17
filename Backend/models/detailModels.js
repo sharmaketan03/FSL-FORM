@@ -24,6 +24,14 @@ import mongoose from "mongoose"
         type:Date,
         required:true
      },
+     imageFront:{
+          type:String,
+          required:true
+     },
+      imageBack:{
+          type:String,
+          required:true
+     },
     gender:{
         type:String,enum:["male","female","other"],
         required:true

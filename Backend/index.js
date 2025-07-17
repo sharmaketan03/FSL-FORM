@@ -23,6 +23,11 @@ const port = process.env.PORT;
 
 app.use("/api/form", detailRouter);
 
+
+
+// 👇 Route to handle image upload
+
+
 app.listen(port, () => {
   console.log(`Server port is ${port}`);
 });
