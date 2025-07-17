@@ -8,6 +8,8 @@ import mongoose from "mongoose"
      Name:{
         type:String,
         required:true,
+        min:4,
+        max:30,
      }
      ,
      email:{
@@ -15,15 +17,15 @@ import mongoose from "mongoose"
           required:true
      },
      phone:{
-         type:String,
+         type:Number,
          required:true
      },
      date:{
-        type:String,
+        type:Date,
         required:true
      },
     gender:{
-        type:String,
+        type:String,enum:["male","female","other"],
         required:true
     },
     guardianDetails:{
@@ -31,7 +33,7 @@ import mongoose from "mongoose"
         required:true
     },
      guardianPhone:{
-         type:String,
+         type:Number,
         required:true
      },
      localaddress:{
@@ -47,7 +49,7 @@ import mongoose from "mongoose"
         required:false
       },
        year: {
-         type:String,
+         type:Number,
         required:false
        },
          university: {

@@ -1,39 +1,28 @@
 // import mongoose, { connection } from "mongoose"
-import express from "express"
-import mongoose from "mongoose"
-import cors from "cors"
-import "dotenv/config"
-import connectdb from "./config/db.js"
-// import mongdatamodel  from "./models/detailModels"
-import detailRouter from "./Routes/detailsRoutes.js"
- await connectdb()
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import "dotenv/config";
+import connectdb from "./config/db.js";
 
- connectdb()
-const corsOptions={
-    origin:"http://localhost:5173"
-}
+import detailRouter from "./Routes/detailsRoutes.js";
 
-const app=express()
-app.use(cors(corsOptions))
-const port=4000
+const app = express();
+connectdb();
+app.use(express.json());
 
+const corsOptions = {
+  origin: process.env.FRONTEND_URL,
+  methods: ["GET", "POST", "DELETE", "PUT"],
+  credentials: true,
+};
 
-
-
-
+app.use(cors(corsOptions));
+const port = process.env.PORT;
 
 
+app.use("/api/form", detailRouter);
 
-
-app.use(express.json())
-
-app.use("/api/form",detailRouter)
-
-
-
-
-
-
-app.listen(port,()=>{
-      console.log(`Server port is ${port}`)
-})
+app.listen(port, () => {
+  console.log(`Server port is ${port}`);
+});
