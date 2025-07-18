@@ -13,3 +13,15 @@ detailRouter.post("/add", upload.fields([
 // detailRouter.get('/get', getDetails);
 
 export default detailRouter;
+
+
+// import {Router} from "express"
+// import { addDetails } from "../Controllers/addDetails"
+
+// const detailRouter=Router()
+// detailRouter.post("/add",upload.fields([]
+//     name:"imageFront",maxCount:1,
+//     name:"imageBack",maxCount:1,
+// ]),addDetails)
+
+// export default detailRouter

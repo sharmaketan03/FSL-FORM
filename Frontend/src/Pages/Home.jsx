@@ -22,6 +22,7 @@ function Home() {
     Company: "",
     course: ""
   });
+  
 
   const [formdisabled, setDisabled] = useState(false);
   const [educational, setEducational] = useState("student");
@@ -34,7 +35,7 @@ function Home() {
       setForm(prev => ({ ...prev, [name]: value }));
     }
   }
-
+  // console.log(form.imageFront)
   function toggle(e) {
     setEducational(e.target.id);
   }
@@ -90,6 +91,7 @@ function Home() {
           <div className="mt-4">
             <label className="block font-medium">Upload Aadhaar Card:</label>
             <input type="file" name="imageFront" onChange={handleForm} className="mt-1" accept="image/*" required />
+           
             <input type="file" name="imageBack" onChange={handleForm} className="mt-1" accept="image/*" required />
           </div>
         </div>
