@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import "../index.css";
 import { instance } from '../axios.js';
-// import {useFormStatus} from "react-dom"
 
 function Home() {
   const [form, setForm] = useState({
@@ -9,8 +8,9 @@ function Home() {
     email: "",
     phone: "",
     date: "",
-    imageFront: "",
-    imageBack:"",
+    imageFront: null,
+    imageBack: null,
+    gender: "",
     guardianDetails: "",
     guardianPhone: "",
     localaddress: "",
@@ -22,29 +22,16 @@ function Home() {
     Company: "",
     course: ""
   });
-  const [formdisabled,setDisabled]=useState(false)
 
+  const [formdisabled, setDisabled] = useState(false);
   const [educational, setEducational] = useState("student");
 
-
-  
-  function handelForm(e) {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  }
-
-  async function handelSumbit(e) {
-    console.log("first");
-    setDisabled(false)
-
-    e.preventDefault();
-    await new Promise(res=>setTimeout(res,2000))
-    console.log(form);
-
-    let res = await instance.post('/api/form/add', form);
-    console.log(res);
-    if(res){
-        setDisabled(true)
+  function handleForm(e) {
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      setForm(prev => ({ ...prev, [name]: files[0] }));
+    } else {
+      setForm(prev => ({ ...prev, [name]: value }));
     }
   }
 
@@ -52,214 +39,119 @@ function Home() {
     setEducational(e.target.id);
   }
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setDisabled(false);
+
+    let formData = new FormData();
+    if(form){
+      for (let key in form) {
+      formData.append(key, form[key]);
+      
+    }
+    
+   console.log(formData,form)
+    
+  let res=  await instance.post('/api/form/add', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+});
+        
+      console.log(res.data);
+     
+    }
+    
+   
+  }
 
   return (
-    <div className="w-[90%] mx-auto p-6 bg-white shadow-lg rounded-lg mt-30">
-      <form onSubmit={handelSumbit} className="space-y-6"  method="post" enctype="multipart/form-data">
-
-      {/* <Customerform/> */}
-                 <div className="bg-gray-50 p-4 rounded-lg border">
-  <h2 className="text-2xl font-semibold mb-4">Personal Details</h2>
-
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div className="flex flex-col md:flex-row md:items-center gap-2">
-      <label htmlFor="Name" className="w-32 font-medium">Name</label>
-      <input
-        type="text"
-        name="Name"
-        id="Name"
-        required
-        value={form.Name}
-        onChange={handelForm}
-        className="flex-1 p-2 border rounded"
-        placeholder="Enter your name"
-      />
-    </div>
-
-    <div className="flex flex-col md:flex-row md:items-center gap-2">
-      <label htmlFor="email" className="w-32 font-medium">Email</label>
-      <input
-        type="email"
-        name="email"
-        id="email"
-        required
-        value={form.email}
-        onChange={handelForm}
-        className="flex-1 p-2 border rounded"
-        placeholder="Enter your email"
-      />
-    </div>
-
-    <div className="flex flex-col md:flex-row md:items-center gap-2">
-      <label htmlFor="phone" className="w-32 font-medium">Phone</label>
-      <input
-        type="text"
-        name="phone"
-        id="phone"
-        required
-        value={form.phone}
-        onChange={handelForm}
-        className="flex-1 p-2 border rounded"
-        placeholder="Enter your phone"
-      />
-    </div>
-
-    <div className="flex flex-col md:flex-row md:items-center gap-2">
-      <label htmlFor="date" className="w-32 font-medium">Date of Birth</label>
-      <input
-        type="date"
-        name="date"
-        id="date"
-        required
-        value={form.date}
-        onChange={handelForm}
-        className="flex-1 p-2 border rounded"
-      />
-    </div>
-  </div>
-
-  <div className="mt-6 flex">
-    <p className="font-medium mb-2 ">Gender</p>
-    <div className="flex gap-6">
-      <label className="flex items-center gap-1">
-        <input type="radio" name="gender" value="male" onChange={handelForm} /> Male
-      </label>
-      <label className="flex items-center gap-1">
-        <input type="radio" name="gender" value="female" onChange={handelForm} /> Female
-      </label>
-      <label className="flex items-center gap-1">
-        <input type="radio" name="gender" value="other" onChange={handelForm} /> Other
-      </label>
-    </div>
-  </div>
-  <div className='mt-6 font-medium mb-2 gap-6'>
-  <label htmlFor="aadhaarcard">Aadhaar Card:</label>
-  <input type="file"   name='imageFront' onChange={handelForm} value={form.imageFront}/>
-  <input type="file"   name='imageBack' onChange={handelForm} value={form.imageBack}/>
-
-</div>
-</div>
-
-
-       
-       
+    <div className="w-[90%] mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <form onSubmit={handleSubmit} className="space-y-6" method="post" encType="multipart/form-data">
         <div className="bg-gray-50 p-4 rounded-lg border">
-          <h2 className="text-xl font-semibold mb-4">Parent / Guardian Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="guardianDetails" className="block mb-1 font-medium">Guardian Name</label>
-              <input type="text" name="guardianDetails" id="guardianDetails" value={form.guardianDetails} onChange={handelForm} className="w-full p-2 border rounded" />
+          <h2 className="text-2xl font-semibold mb-4">Personal Details</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input type="text" name="Name" placeholder="Name" value={form.Name} onChange={handleForm} className="p-2 border rounded" required />
+            <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleForm} className="p-2 border rounded" required />
+            <input type="text" name="phone" placeholder="Phone" value={form.phone} onChange={handleForm} className="p-2 border rounded" required />
+            <input type="date" name="date" value={form.date} onChange={handleForm} className="p-2 border rounded" required />
+          </div>
+
+          <div className="mt-4">
+            <label>Gender:</label>
+            <div className="flex gap-4">
+              <label><input type="radio" name="gender" value="male" onChange={handleForm} /> Male</label>
+              <label><input type="radio" name="gender" value="female" onChange={handleForm} /> Female</label>
+              <label><input type="radio" name="gender" value="other" onChange={handleForm} /> Other</label>
             </div>
-            <div>
-              <label htmlFor="guardianPhone" className="block mb-1 font-medium">Guardian Phone</label>
-              <input type="text" name="guardianPhone" id="guardianPhone" value={form.guardianPhone} onChange={handelForm} className="w-full p-2 border rounded" />
-            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="block font-medium">Upload Aadhaar Card:</label>
+            <input type="file" name="imageFront" onChange={handleForm} className="mt-1" accept="image/*" required />
+            <input type="file" name="imageBack" onChange={handleForm} className="mt-1" accept="image/*" required />
           </div>
         </div>
 
-       
-        <div>
-          <h2 className="text-xl font-semibold">Residential Details</h2>
-          <div className="mt-4">
-            <label htmlFor="localaddress" className="block mb-1 font-medium">Local Address</label>
-            <textarea name="localaddress" id="localaddress" value={form.localaddress} onChange={handelForm} className="w-full p-2 border rounded" rows={3}></textarea>
-          </div>
-          <div className="mt-4">
-            <label htmlFor="permanentaddress" className="block mb-1 font-medium">Permanent Address</label>
-            <textarea name="permanentaddress" id="permanentaddress" value={form.permanentaddress} onChange={handelForm} className="w-full p-2 border rounded" rows={3}></textarea>
-          </div>
+        {/* Guardian Details */}
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h2 className="text-xl font-semibold mb-4">Guardian Details</h2>
+          <input type="text" name="guardianDetails" placeholder="Guardian Name" value={form.guardianDetails} onChange={handleForm} className="p-2 border rounded w-full mb-3" required />
+          <input type="text" name="guardianPhone" placeholder="Guardian Phone" value={form.guardianPhone} onChange={handleForm} className="p-2 border rounded w-full" required />
         </div>
 
-   
-        <div>
-          <h2 className="text-xl font-semibold mt-6">Educational Details</h2>
-          <div className="flex gap-6 my-2">
-            <label><input type="radio" name="student" id="student" onClick={toggle} checked={educational=="student"}/> Student</label>
-            <label><input type="radio" name="student" id="workingprofessional" onClick={toggle} /> Working Professional</label>
+        {/* Address */}
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h2 className="text-xl font-semibold mb-4">Address</h2>
+          <textarea name="localaddress" placeholder="Local Address" value={form.localaddress} onChange={handleForm} className="w-full p-2 border rounded mb-3" rows={2} required></textarea>
+          <textarea name="permanentaddress" placeholder="Permanent Address" value={form.permanentaddress} onChange={handleForm} className="w-full p-2 border rounded" rows={2} required></textarea>
+        </div>
+
+        {/* Education / Work */}
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h2 className="text-xl font-semibold mb-4">Education / Work</h2>
+          <div className="flex gap-4 mb-4">
+            <label><input type="radio" name="student" id="student" onClick={toggle} checked={educational === "student"} /> Student</label>
+            <label><input type="radio" name="student" id="workingprofessional" onClick={toggle} checked={educational === "workingprofessional"} /> Working Professional</label>
           </div>
 
           {educational === "student" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="qualification" className="block mb-1 font-medium">Last Qualification</label>
-                <input type="text" name="qualification" id="qualification" value={form.qualification} onChange={handelForm} className="w-full p-2 border rounded" />
-              </div>
-              <div>
-                <label htmlFor="year" className="block mb-1 font-medium">Completion Year</label>
-                <input type="text" name="year" id="year" value={form.year} onChange={handelForm} className="w-full p-2 border rounded" />
-              </div>
-              <div>
-                <label htmlFor="university" className="block mb-1 font-medium">University</label>
-                <input type="text" name="university" id="university" value={form.university} onChange={handelForm} className="w-full p-2 border rounded" />
-              </div>
-            </div>
-          ) : educational === "workingprofessional" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="designation" className="block mb-1 font-medium">Designation</label>
-                <input type="text" name="designation" id="designation" value={form.designation} onChange={handelForm} className="w-full p-2 border rounded" />
-              </div>
-              <div>
-                <label htmlFor="Company" className="block mb-1 font-medium">Company</label>
-                <input type="text" name="Company" id="Company" value={form.Company} onChange={handelForm} className="w-full p-2 border rounded" />
-              </div>
-            </div>
-          ) : null}
+            <>
+              <input type="text" name="qualification" placeholder="Qualification" value={form.qualification} onChange={handleForm} className="p-2 border rounded w-full mb-3" />
+              <input type="text" name="year" placeholder="Passing Year" value={form.year} onChange={handleForm} className="p-2 border rounded w-full mb-3" />
+              <input type="text" name="university" placeholder="University" value={form.university} onChange={handleForm} className="p-2 border rounded w-full" />
+            </>
+          ) : (
+            <>
+              <input type="text" name="designation" placeholder="Designation" value={form.designation} onChange={handleForm} className="p-2 border rounded w-full mb-3" />
+              <input type="text" name="Company" placeholder="Company" value={form.Company} onChange={handleForm} className="p-2 border rounded w-full" />
+            </>
+          )}
         </div>
 
-        {/* Course Details */}
-        <div>
-          <h2 className="text-xl font-semibold mt-6">Course Details</h2>
-          <label htmlFor="course" className="block mb-1 font-medium">Select Course</label>
-          <select name="course" id="course" value={form.course} onChange={handelForm} className="w-full p-2 border rounded">
+        {/* Course Selection */}
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h2 className="text-xl font-semibold mb-4">Course</h2>
+          <select name="course" value={form.course} onChange={handleForm} className="w-full p-2 border rounded" required>
             <option value="">-- Select Course --</option>
-            <option value="Android Devlopment">Android Development</option>
-            <option value="Software Development">Software Development</option>
+            <option value="Android Development">Android Development</option>
+            <option value="Full Stack Development">Full Stack Development</option>
             <option value="Frontend Development">Frontend Development</option>
             <option value="Backend Development">Backend Development</option>
-            <option value="Full Stack Development">Full Stack Development</option>
-            <option value="UI/Ux Development">UI/Ux Development</option>
+            <option value="Digital Marketing">Digital Marketing</option>
+            <option value="Node Js">Node Js</option>
+            <option value="React">React</option>
             <option value="PHP">PHP</option>
             <option value="Python">Python</option>
-            <option value="React">React</option>
-            <option value="web Design">Web Design</option>
-            <option value="Photoshop">Photoshop</option>
-            <option value="Node Js">Node Js</option>
-            <option value="Digital Marketing">Digital Marketing</option>
-            <option value="Core Java">Core Java</option>
+            <option value="UI/UX">UI/UX</option>
           </select>
         </div>
 
-        {/* Source of Information */}
-        <div className="mt-4">
-          <p className="font-medium mb-2">How did you come to know about us?</p>
-          <div className="flex flex-wrap gap-4">
-            <label><input type="radio" name="suggestion" id="google" /> Google</label>
-            <label><input type="radio" name="suggestion" id="linkdin" /> LinkedIn</label>
-            <label><input type="radio" name="suggestion" id="instagram" /> Instagram</label>
-            <label><input type="radio" name="suggestion" id="collegetpo" /> College TPO</label>
-            <label><input type="radio" name="suggestion" id="friend" /> Friend</label>
-          </div>
-        </div>
-
-        <button type="submit"   className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6">Submit</button>
-
+        <button type="submit"  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6">Submit</button>
       </form>
-    </div>  
+    </div>
   );
 }
 
 export default Home;
-
-
-
-
-
-
-
-
-
-
-
-
-
